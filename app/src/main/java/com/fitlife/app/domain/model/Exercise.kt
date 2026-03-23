@@ -1,5 +1,8 @@
 package com.fitlife.app.domain.model
 
+import androidx.room.Entity
+
+@Entity()
 data class Exercise (
     val id: String,
     val name: String,
