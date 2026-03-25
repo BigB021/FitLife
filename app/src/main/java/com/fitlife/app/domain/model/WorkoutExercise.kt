@@ -1,11 +1,20 @@
 package com.fitlife.app.domain.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
-@Entity()
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            entity = WorkoutSession::class,
+            parentColumns = ["id"],
+            childColumns = ["sessionId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class WorkoutExercise (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val sessionId: Int,
     val exerciseId: String,
     val sets: Int,
     val reps: Int,
