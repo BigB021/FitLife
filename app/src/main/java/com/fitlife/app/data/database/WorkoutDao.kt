@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.fitlife.app.domain.model.Exercise
 import com.fitlife.app.domain.model.WorkoutExercise
 import com.fitlife.app.domain.model.WorkoutSession
 
