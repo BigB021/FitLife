@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class UserViewModel(private val userRepository: UserRepository): ViewModel() {
-    val user = MutableLiveData<User?>()
+    val userVm = MutableLiveData<User?>()
 
     fun addUser(user: User) {
         viewModelScope.launch {
@@ -16,9 +16,16 @@ class UserViewModel(private val userRepository: UserRepository): ViewModel() {
         }
     }
 
-    fun loadUser() {
+    fun loadUser(id: Int) {
         viewModelScope.launch {
-            user.value = userRepository.getUser()
+            userVm.value = userRepository.getUserById(id)
+        }
+    }
+
+    fun updateUser(user: User){
+        viewModelScope.launch {
+            userRepository.updateUser(user)
+            loadUser(user.id)
         }
     }
 

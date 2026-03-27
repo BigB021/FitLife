@@ -4,22 +4,45 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fitlife.app.data.repository.MealRepository
+import com.fitlife.app.domain.model.DailySummary
 import com.fitlife.app.domain.model.FoodEntry
 import com.fitlife.app.domain.model.Meal
 import com.fitlife.app.domain.model.MealWithFood
 import kotlinx.coroutines.launch
 
 class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
-    val meals = MutableLiveData<List<Meal>>(emptyList())
-    val foodList = MutableLiveData<List<FoodEntry>>(emptyList())
     val mealsWithFood = MutableLiveData<List<MealWithFood>>(emptyList())
+    val dailyMacros = MutableLiveData<DailySummary>()
 
+    private fun refreshData(date: String) {
+        viewModelScope.launch {
+            mealsWithFood.value = mealRepository.getMealsWithFood()
+            dailyMacros.value = mealRepository.getDailyMacros(date)
+        }
+    }
+    fun addDailyMacros(date: String){
+        viewModelScope.launch {
+            mealRepository.addDailyMacros(date)
+        }
+    }
+    fun loadDailyMacros(date: String) {
+        viewModelScope.launch {
+            dailyMacros.value = mealRepository.getDailyMacros(date)
+        }
+    }
+
+    fun updateDailyMacros(date: String){
+        viewModelScope.launch {
+            mealRepository.updateDailyMacros(date)
+        }
+    }
 
     fun addMeal(meal: Meal){
         viewModelScope.launch {
             try {
                 val mealId = mealRepository.addMeal(meal)
-                getAllMeals()
+                mealRepository.updateDailyMacros(meal.date)
+                refreshData(meal.date)
             } catch (e: Exception) {
                 println(e)
             }
@@ -29,7 +52,9 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
         viewModelScope.launch {
             try {
                 mealRepository.addFood(food)
-                getAllMeals()
+                val meal = mealRepository.getMeal(food.mealId)
+                mealRepository.updateDailyMacros(meal.date)
+                refreshData(meal.date)
             } catch (e: Exception) {
                 println(e)
             }
@@ -40,25 +65,6 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
     fun loadMealsWithFoods() {
         viewModelScope.launch {
             mealsWithFood.value = mealRepository.getMealsWithFood()
-        }
-    }
-
-    fun getAllMeals(){
-        viewModelScope.launch {
-            try {
-                meals.value = mealRepository.getAllMeals()
-            } catch (e: Exception) {
-                println(e)
-            }
-        }
-    }
-    fun getMealFood(mealId: Int){
-        viewModelScope.launch {
-            try {
-                foodList.value = mealRepository.getMealFood(mealId)
-            } catch (e: Exception) {
-                println(e)
-            }
         }
     }
 
@@ -76,7 +82,8 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
         viewModelScope.launch {
             try {
                 mealRepository.deleteMeal(meal)
-                meals.value = mealRepository.getAllMeals()
+                mealRepository.updateDailyMacros(meal.date)
+                refreshData(meal.date)
             } catch (e: Exception) {
                 println(e)
             }
@@ -86,10 +93,14 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
         viewModelScope.launch {
             try {
                 mealRepository.deleteFood(food)
-                getAllMeals()
+                val meal = mealRepository.getMeal(food.mealId)
+                mealRepository.updateDailyMacros(meal.date)
+                refreshData(meal.date)
             } catch (e: Exception) {
                 println(e)
             }
         }
     }
+
+
 }

@@ -9,9 +9,11 @@ interface UserDao {
     @Insert
     suspend fun insertUser(user: User)
 
-    // todo: change it to getUserById or something, only testing stuff here
-    @Query("SELECT * FROM User LIMIT 1")
-    suspend fun getUser(): User?
+    @Query("SELECT * FROM User WHERE id = :id")
+    suspend fun getUserById(id: Int): User?
+
+    @Update
+    suspend fun updateUser(user: User)
 
     @Delete
     suspend fun deleteUser(user: User): Int
