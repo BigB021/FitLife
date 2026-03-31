@@ -16,7 +16,7 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
 
     private fun refreshData(date: String) {
         viewModelScope.launch {
-            mealsWithFood.value = mealRepository.getMealsWithFood()
+            mealsWithFood.value = mealRepository.getMealsWithFoodByDate(date)
             dailyMacros.value = mealRepository.getDailyMacros(date)
         }
     }

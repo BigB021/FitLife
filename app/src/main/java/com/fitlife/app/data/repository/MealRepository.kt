@@ -10,10 +10,8 @@ class MealRepository(private val mealDao: MealDao) {
     suspend fun addMeal(meal: Meal):Long = mealDao.insertMeal(meal)
     suspend fun addFood(food: FoodEntry) = mealDao.insertFood(food)
     suspend fun addDailyMacros(date: String) = mealDao.insertDailyMacros(DailySummary(date,.0f,.0f,.0f,.0f))
-    suspend fun getAllMeals(): List<Meal> = mealDao.getAllMeals()
     suspend fun getMeal(id: Int): Meal = mealDao.getMeal(id)
-    suspend fun getMealFood(mealId: Int): List<FoodEntry> = mealDao.getMealFood(mealId)
-    suspend fun getMealsByDate(date: String): List<Meal> = mealDao.getMealsByDate(date)
+    suspend fun getMealsWithFoodByDate(date: String): List<MealWithFood> = mealDao.getMealsWithFoodByDate(date)
     suspend fun getDailyMacros(date: String): DailySummary {
         return try {
             mealDao.getDailyMacros(date)

@@ -20,14 +20,8 @@ interface MealDao {
     @Insert
     suspend fun insertDailyMacros(dailySummary: DailySummary)
 
-    @Query("SELECT * FROM Meal")
-    suspend fun getAllMeals(): List<Meal>
     @Query("SELECT * FROM Meal WHERE id = :id")
     suspend fun getMeal(id: Int): Meal
-    @Query("SELECT * FROM FoodEntry WHERE mealId = :mealId")
-    suspend fun getMealFood(mealId: Int): List<FoodEntry>
-    @Query("SELECT * FROM Meal WHERE date = :date")
-    suspend fun getMealsByDate(date: String): List<Meal>
     @Query("SELECT * FROM DailySummary WHERE date = :date")
     suspend fun getDailyMacros(date: String): DailySummary
 
