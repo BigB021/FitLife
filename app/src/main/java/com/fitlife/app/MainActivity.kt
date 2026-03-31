@@ -1,47 +1,33 @@
 package com.fitlife.app
 
+import SetupScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.fitlife.app.ui.theme.FitLifeTheme
+import com.fitlife.app.data.database.AppDatabase
+import com.fitlife.app.data.repository.UserRepository
+import com.fitlife.app.viewModel.UserViewModel
+import com.fitlife.app.viewModel.UserViewModelFactory
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var db: AppDatabase
+    private lateinit var userRepository: UserRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        db = AppDatabase.getDatabase(this)
+        userRepository = UserRepository(db.userDao())
+
         setContent {
-            FitLifeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            val viewModel: UserViewModel = viewModel(
+                factory = UserViewModelFactory(userRepository)
+            )
+
+            SetupScreen(viewModel)
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FitLifeTheme {
-        Greeting("Android")
-    }
 }

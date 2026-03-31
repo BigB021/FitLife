@@ -7,11 +7,12 @@ import com.fitlife.app.domain.model.User
 interface UserDao {
 
     @Insert
-    suspend fun insertUser(user: User)
+    suspend fun insertUser(user: User): Long
 
     @Query("SELECT * FROM User WHERE id = :id")
     suspend fun getUserById(id: Int): User?
-
+    @Query("SELECT * FROM User LIMIT 1")
+    suspend fun getUser(): User?
     @Update
     suspend fun updateUser(user: User)
 

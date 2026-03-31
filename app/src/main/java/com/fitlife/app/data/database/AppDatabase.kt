@@ -6,12 +6,13 @@ import androidx.room.RoomDatabase
 import com.fitlife.app.domain.model.DailySummary
 import com.fitlife.app.domain.model.Exercise
 import com.fitlife.app.domain.model.FoodEntry
+import com.fitlife.app.domain.model.Meal
 import com.fitlife.app.domain.model.User
 import com.fitlife.app.domain.model.WorkoutExercise
 import com.fitlife.app.domain.model.WorkoutSession
 
 @Database(
-    entities = [User::class, FoodEntry::class, Exercise::class, DailySummary::class, WorkoutExercise::class, WorkoutSession::class],
+    entities = [User::class, FoodEntry::class, Exercise::class, DailySummary::class, WorkoutExercise::class, WorkoutSession::class, Meal::class],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {

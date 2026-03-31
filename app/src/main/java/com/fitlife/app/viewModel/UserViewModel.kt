@@ -1,5 +1,6 @@
 package com.fitlife.app.viewModel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fitlife.app.data.repository.UserRepository
 import com.fitlife.app.domain.model.User
@@ -7,8 +8,54 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
+data class UserFormState(
+    val name: String = "",
+    val age: String = "",
+    val gender: String = "",
+    val height: String = "",
+    val weight: String = "",
+    val activityLevel: String = "",
+    val goalType: String = ""
+)
 class UserViewModel(private val userRepository: UserRepository): ViewModel() {
-    val userVm = MutableLiveData<User?>()
+    // Form state for UI
+    private val _formState = MutableLiveData(UserFormState())
+    val formState: LiveData<UserFormState> = _formState
+
+    // Saved user
+    private val _user = MutableLiveData<User?>()
+    val user: LiveData<User?> = _user
+
+    // Form update functions
+
+    fun onNameChange(name: String) {
+        _formState.value = _formState.value?.copy(name = name)
+    }
+
+    fun onAgeChange(age: String) {
+        _formState.value = _formState.value?.copy(age = age)
+    }
+
+    fun onGenderChange(gender: String) {
+        _formState.value = _formState.value?.copy(gender = gender)
+    }
+
+    fun onHeightChange(height: String) {
+        _formState.value = _formState.value?.copy(height = height)
+    }
+
+    fun onWeightChange(weight: String) {
+        _formState.value = _formState.value?.copy(weight = weight)
+    }
+
+    fun onActivityLevelChange(level: String) {
+        _formState.value = _formState.value?.copy(activityLevel = level)
+    }
+
+    fun onGoalChange(goal: String) {
+        _formState.value = _formState.value?.copy(goalType = goal)
+    }
+
 
     fun addUser(user: User) {
         viewModelScope.launch {
@@ -16,22 +63,49 @@ class UserViewModel(private val userRepository: UserRepository): ViewModel() {
         }
     }
 
-    fun loadUser(id: Int) {
+    // Save user
+    fun saveUser() {
         viewModelScope.launch {
-            userVm.value = userRepository.getUserById(id)
+            val state = _formState.value ?: return@launch
+
+            val user = User(
+                name = state.name,
+                age = state.age.toIntOrNull() ?: 0,
+                gender = state.gender,
+                height = state.height.toFloatOrNull() ?: 0f,
+                weight = state.weight.toFloatOrNull() ?: 0f,
+                activityLevel = state.activityLevel,
+                goalType = state.goalType,
+
+                // TODO: calculate macro targets later
+                calorieTarget = 0f,
+                proteinTarget = 0f,
+                carbTarget = 0f,
+                fatTarget = 0f
+            )
+
+            userRepository.addUser(user)
+            _user.value = user
+        }
+    }
+
+    fun loadUser() {
+        viewModelScope.launch {
+            _user.value = userRepository.getUser()
         }
     }
 
     fun updateUser(user: User){
         viewModelScope.launch {
             userRepository.updateUser(user)
-            loadUser(user.id)
+            _user.value = user
         }
     }
 
     fun deleteUser(user: User){
         viewModelScope.launch {
             userRepository.deleteUser(user)
+            _user.value = null
         }
     }
 
