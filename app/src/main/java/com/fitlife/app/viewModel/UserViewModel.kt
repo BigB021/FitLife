@@ -21,7 +21,8 @@ class UserViewModel(private val userRepository: UserRepository): ViewModel() {
     // Form state for UI
     private val _formState = MutableLiveData(UserFormState())
     val formState: LiveData<UserFormState> = _formState
-
+    private val _saveResult = MutableLiveData<Result<Unit>>()
+    val saveResult: LiveData<Result<Unit>> = _saveResult
     // Saved user
     private val _user = MutableLiveData<User?>()
     val user: LiveData<User?> = _user
@@ -56,36 +57,40 @@ class UserViewModel(private val userRepository: UserRepository): ViewModel() {
         _formState.value = _formState.value?.copy(goalType = goal)
     }
 
-
-    fun addUser(user: User) {
-        viewModelScope.launch {
-            userRepository.addUser(user)
-        }
-    }
-
     // Save user
     fun saveUser() {
         viewModelScope.launch {
             val state = _formState.value ?: return@launch
+            try {
 
-            val user = User(
-                name = state.name,
-                age = state.age.toIntOrNull() ?: 0,
-                gender = state.gender,
-                height = state.height.toFloatOrNull() ?: 0f,
-                weight = state.weight.toFloatOrNull() ?: 0f,
-                activityLevel = state.activityLevel,
-                goalType = state.goalType,
+                val draft = User(
+                    name = state.name,
+                    age = state.age.toIntOrNull() ?: 0,
+                    gender = state.gender,
+                    height = state.height.toFloatOrNull() ?: 0f,
+                    weight = state.weight.toFloatOrNull() ?: 0f,
+                    activityLevel = state.activityLevel,
+                    goalType = state.goalType,
+                    calorieTarget = 0f, proteinTarget = 0f,
+                    carbTarget = 0f,    fatTarget = 0f
+                )
 
-                // TODO: calculate macro targets later
-                calorieTarget = 0f,
-                proteinTarget = 0f,
-                carbTarget = 0f,
-                fatTarget = 0f
-            )
+                // Calculate and apply macros
+                val macros = userRepository.calculateTargetMacros(draft)
+                val user = draft.copy(
+                    calorieTarget = macros.calories,
+                    proteinTarget = macros.protein,
+                    carbTarget    = macros.carbs,
+                    fatTarget     = macros.fat
+                )
 
-            userRepository.addUser(user)
-            _user.value = user
+                userRepository.addUser(user)
+                _user.value = user
+                _saveResult.value = Result.success(Unit)
+
+            } catch (e: Exception) {
+                _saveResult.value = Result.failure(e)
+            }
         }
     }
 
