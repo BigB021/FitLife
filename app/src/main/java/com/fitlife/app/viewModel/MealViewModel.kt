@@ -39,6 +39,29 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
         }
     }
 
+    fun createMealAndStartLogging(
+        type: String,
+        date: String,
+        onCreated: (Int) -> Unit
+    ) {
+        viewModelScope.launch {
+            val mealId = mealRepository.addMeal(
+                Meal(type = type, date = date)
+            ).toInt()
+
+            onCreated(mealId)
+        }
+    }
+
+    fun deleteMealIfEmpty(mealId: Int) {
+        viewModelScope.launch {
+            val foods = mealRepository.getMealWithFood(mealId)
+            if (foods?.foods?.isEmpty() == true) {
+                mealRepository.deleteMeal(foods.meal)
+            }
+        }
+    }
+
     fun clearActiveMeal() { _activeMealId.value = null }
 
     private fun refreshData(date: String) {

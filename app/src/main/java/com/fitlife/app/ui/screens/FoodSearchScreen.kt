@@ -71,7 +71,9 @@ fun FoodSearchScreen(
                     }) {
                         Icon(Icons.Outlined.Close, contentDescription = "Close")
                     }
+
                 }
+
             )
         }
     ) { paddingValues ->

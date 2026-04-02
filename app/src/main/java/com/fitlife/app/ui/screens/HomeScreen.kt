@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.WbSunny
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +45,7 @@ fun HomeScreen(
     userViewModel: UserViewModel,
     mealViewModel: MealViewModel,
     workoutViewModel: WorkoutViewModel,
+    onNavigateToHistory: () -> Unit,
     onNavigateToMeals: () -> Unit = {},
     onNavigateToWorkout: () -> Unit = {}
 ) {
@@ -82,6 +84,12 @@ fun HomeScreen(
 
         if (sessions.isNotEmpty()) RecentWorkoutsCard(sessions = sessions.take(3))
         Spacer(modifier = Modifier.height(24.dp))
+        Button(
+            onClick = onNavigateToHistory,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("View Meal History")
+        }
     }
 }
 

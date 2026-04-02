@@ -16,10 +16,14 @@ interface FoodDao {
     suspend fun getFood(): List<FoodEntry>
     @Query("SELECT * FROM FoodEntry WHERE id = :id")
     suspend fun getFoodById(id: Int): FoodEntry
+    @Query("SELECT * FROM FoodEntry WHERE mealId = :mealId")
+    suspend fun getMealFood(mealId: Int): List<FoodEntry>
+
 
     @Update
     suspend fun updateFood(food: FoodEntry)
 
     @Delete
     suspend fun deleteFood(food: FoodEntry)
+
 }
