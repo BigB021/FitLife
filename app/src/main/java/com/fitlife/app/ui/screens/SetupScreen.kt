@@ -14,9 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.fitlife.app.viewModel.UserFormState
-import com.fitlife.app.viewModel.UserViewModel
 import com.fitlife.app.ui.components.SectionHeader
 import com.fitlife.app.ui.components.DropdownField
+import com.fitlife.app.viewModel.UserViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

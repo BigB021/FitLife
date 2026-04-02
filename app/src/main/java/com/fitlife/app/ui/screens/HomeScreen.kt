@@ -2,16 +2,10 @@ package com.fitlife.app.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fitlife.app.ui.components.CalorieSummaryCard
 import com.fitlife.app.ui.components.GreetingHeader
@@ -77,37 +71,3 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// REUSABLE COMPONENTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// ── Greeting Header ────────────────────────────────────────────────────────────
-
-
-// ── Calorie Summary Card with Ring ────────────────────────────────────────────
-
-
-// ── Animated Calorie Ring ──────────────────────────────────────────────────────
-
-
-// ── Macro Progress Card ───────────────────────────────────────────────────────
-
-
-// ── Single Macro Row with animated bar ────────────────────────────────────────
-
-
-// ── Quick Actions Row ─────────────────────────────────────────────────────────
-
-
-// ── Quick Action Button ────────────────────────────────────────────────────────
-
-// ── Recent Workouts Card ──────────────────────────────────────────────────────
-
-
-// ── Workout Session Row ────────────────────────────────────────────────────────
-
-// ── Calorie Stat Item ─────────────────────────────────────────────────────────
-
-
-// ── Generic Section Card ──────────────────────────────────────────────────────
