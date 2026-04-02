@@ -12,11 +12,16 @@ class FoodViewModel(private val foodRepository: FoodRepository) : ViewModel() {
     // Search State
     private val _searchResults = MutableLiveData<List<FoodEntry>>(emptyList())
     val searchResults: LiveData<List<FoodEntry>> = _searchResults
+    private val _searchError = MutableLiveData<String?>(null)
+    val searchError: LiveData<String?> = _searchError
+
     private val _barcodeResult = MutableLiveData<FoodEntry?>()
     val barcodeResult: LiveData<FoodEntry?> = _barcodeResult
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
+
+    fun clearError() { _searchError.value = null }
     // Local database functions
     fun loadFood() {
         viewModelScope.launch {
@@ -50,11 +55,10 @@ class FoodViewModel(private val foodRepository: FoodRepository) : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val results = foodRepository.searchByName(query)
-                _searchResults.value = results
+                _searchResults.value = foodRepository.searchByName(query)
             } catch (e: Exception) {
-                println(e)
                 _searchResults.value = emptyList()
+                _searchError.value = e.message   // expose error to UI
             } finally {
                 _isLoading.value = false
             }

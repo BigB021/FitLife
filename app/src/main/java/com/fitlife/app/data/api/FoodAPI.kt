@@ -2,19 +2,20 @@ package com.fitlife.app.data.api
 
 import com.fitlife.app.data.dto.ProductResponseDto
 import com.fitlife.app.data.dto.SearchResponseDto
+import com.fitlife.app.data.dto.UsdaSearchResponseDto
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface FoodAPI {
+// Open Food Facts - barcode search
+interface OpenFoodAPI {
 
     @GET("api/v2/product/{barcode}.json")
     suspend fun getProductByBarcode(
         @Path("barcode") barcode: String,
-
-        @Query("fields")
-        fields: String = "energy-kcal_100g,product_name,proteins_100g,carbohydrates_100g,fat_100g"
-    ): ProductResponseDto
+        @Query("fields") fields: String = "product_name,nutriments"
+    ): Response<ProductResponseDto>
 
     @GET("cgi/search.pl")
     suspend fun searchFood(
@@ -22,7 +23,18 @@ interface FoodAPI {
         @Query("search_simple") simple: Int = 1,
         @Query("action") action: String = "process",
         @Query("json") json: Int = 1,
-        @Query("page_size") pageSize: Int = 20
-    ): SearchResponseDto
+        @Query("page_size") pageSize: Int = 20,
+        @Query("fields") fields: String = "product_name,nutriments"
+    ): Response<SearchResponseDto>
+}
 
+// USDA FoodData Central - name search
+interface UsdaFoodAPI {
+    @GET("fdc/v1/foods/search")
+    suspend fun searchFood(
+        @Query("query") query: String,
+        @Query("api_key") apiKey: String,
+        @Query("pageSize") pageSize: Int = 25,
+        // No dataType filter
+    ): Response<UsdaSearchResponseDto>
 }

@@ -1,5 +1,6 @@
 package com.fitlife.app.viewModel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +14,32 @@ import kotlinx.coroutines.launch
 class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
     val mealsWithFood = MutableLiveData<List<MealWithFood>>(emptyList())
     val dailyMacros = MutableLiveData<DailySummary>()
+    private val _activeMealId = MutableLiveData<Int?>(null)
+    val activeMealId: LiveData<Int?> = _activeMealId
+
+    private val _todayMealsWithFood = MutableLiveData<List<MealWithFood>>(emptyList())
+    val todayMealsWithFood: LiveData<List<MealWithFood>> = _todayMealsWithFood
+
+    fun loadTodayMeals(date: String) {
+        viewModelScope.launch {
+            _todayMealsWithFood.value = mealRepository.getMealsWithFoodByDate(date)
+        }
+    }
+
+    // Creates meal if not exists for today, exposes its real id
+    fun getOrCreateMeal(type: String, date: String) {
+        viewModelScope.launch {
+            try {
+                val existing = mealRepository.getMealByTypeAndDate(type, date)
+                _activeMealId.value = existing?.id
+                    ?: mealRepository.addMeal(Meal(type = type, date = date)).toInt()
+            } catch (e: Exception) {
+                println(e)
+            }
+        }
+    }
+
+    fun clearActiveMeal() { _activeMealId.value = null }
 
     private fun refreshData(date: String) {
         viewModelScope.launch {
