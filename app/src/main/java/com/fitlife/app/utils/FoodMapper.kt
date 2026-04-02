@@ -7,7 +7,7 @@ import com.fitlife.app.domain.model.FoodEntry
 
 fun ProductDto.toFoodEntry(mealId: Int): FoodEntry = FoodEntry(
     mealId   = mealId,
-    foodName = product_name?.takeIf { it.isNotBlank() } ?: "Unknown",
+    foodName = productName?.takeIf { it.isNotBlank() } ?: "Unknown",
     calories = nutriments?.resolvedKcal() ?: 0f,
     protein  = nutriments?.resolvedProtein() ?: 0f,
     carbs    = nutriments?.resolvedCarbs() ?: 0f,
