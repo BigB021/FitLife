@@ -27,7 +27,7 @@ class MealRepository(private val mealDao: MealDao) {
     suspend fun deleteMeal(meal: Meal) = mealDao.deleteMeal(meal)
     suspend fun deleteFood(food: FoodEntry) = mealDao.deleteFood(food)
 
-    suspend fun getMealWithFood(mealId: Int): MealWithFood? = mealDao.getMealsWithFood().find { it.meal.id == mealId }
+    suspend fun getMealWithFood(mealId: Int): MealWithFood? = mealDao.getMealWithFood(mealId)
     suspend fun getMealsWithFood(): List<MealWithFood> = mealDao.getMealsWithFood()
 
     suspend fun updateDailyMacros(date: String) {

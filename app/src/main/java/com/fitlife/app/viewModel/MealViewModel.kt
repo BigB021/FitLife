@@ -19,6 +19,20 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
 
     private val _todayMealsWithFood = MutableLiveData<List<MealWithFood>>(emptyList())
     val todayMealsWithFood: LiveData<List<MealWithFood>> = _todayMealsWithFood
+    private val _currentMealWithFood = MutableLiveData<MealWithFood?>(null)
+    val currentMealWithFood: LiveData<MealWithFood?> = _currentMealWithFood
+
+    fun loadCurrentMeal(mealId: Int) {
+        viewModelScope.launch {
+            _currentMealWithFood.value = mealRepository.getMealWithFood(mealId)
+        }
+    }
+
+    // Clear on dismiss
+    fun clearActiveMeal() {
+        _activeMealId.value = null
+        _currentMealWithFood.value = null
+    }
 
     fun loadTodayMeals(date: String) {
         viewModelScope.launch {
@@ -61,8 +75,6 @@ class MealViewModel(private val mealRepository: MealRepository): ViewModel() {
             }
         }
     }
-
-    fun clearActiveMeal() { _activeMealId.value = null }
 
     private fun refreshData(date: String) {
         viewModelScope.launch {

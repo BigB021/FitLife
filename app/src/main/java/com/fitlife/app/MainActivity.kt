@@ -118,10 +118,10 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Screen.FOOD_SEARCH -> {
-                    FoodSearchScreen(
+
+                    MealLoggingScreen(
                         foodViewModel = foodViewModel,
                         mealViewModel = mealViewModel,
-                        targetMealId = activeMealId,
                         targetDate = activeDate,
                         onDismiss = {
                             mealViewModel.deleteMealIfEmpty(activeMealId)

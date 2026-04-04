@@ -150,7 +150,7 @@ fun SetupScreen(viewModel: UserViewModel) {
                 DropdownField(
                     modifier = Modifier.weight(1f),
                     label = "Gender",
-                    options = listOf("Male", "Female", "Other"),
+                    options = listOf("Male", "Female"),
                     selected = formState.value.gender,
                     onSelected = { viewModel.onGenderChange(it) },
                     leadingIcon = Icons.Outlined.Wc

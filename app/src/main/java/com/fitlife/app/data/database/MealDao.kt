@@ -47,5 +47,9 @@ interface MealDao {
     @Query("SELECT * FROM Meal WHERE date = :date")
     suspend fun getMealsWithFoodByDate(date: String): List<MealWithFood>
 
+    @Transaction
+    @Query("SELECT * FROM Meal WHERE id = :mealId")
+    suspend fun getMealWithFood(mealId: Int): MealWithFood?
+
 
 }
