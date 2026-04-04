@@ -1,6 +1,6 @@
 package com.fitlife.app.data.dto
 
 data class ProductDto(
-    val productName: String?,
+    val product_name: String?,
     val nutriments: NutrimentsDto?
 )

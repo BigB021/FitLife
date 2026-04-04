@@ -15,7 +15,7 @@ import androidx.room.*
 data class WorkoutExercise (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val sessionId: Int,
-    val exerciseId: String,
+    val exerciseId: Int,
     val sets: Int,
     val reps: Int,
     val weight: Float,

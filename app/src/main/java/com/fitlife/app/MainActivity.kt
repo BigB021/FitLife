@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitlife.app.data.api.NinjasAPI
 import com.fitlife.app.data.api.OpenFoodAPI
 import com.fitlife.app.data.api.UsdaFoodAPI
 import com.fitlife.app.data.database.AppDatabase
@@ -25,11 +26,15 @@ class MainActivity : ComponentActivity() {
     private lateinit var mealRepository: MealRepository
     private lateinit var workoutRepository: WorkoutRepository
     private lateinit var foodRepository: FoodRepository
+    private lateinit var exerciseRepository: ExerciseRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         db = AppDatabase.getDatabase(this)
+
+        val USDA_API_KEY = "thIkdfBjMfBQ9UtDaLHXha6BVbT00DAwbzbxwZxX"
+        val NINJAS_API_KEY = "3TN7xKw8Gv0Y68TREG2JsxJfs2c4apwFqtKSnDIX"
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -54,20 +59,37 @@ class MainActivity : ComponentActivity() {
             .build()
             .create(UsdaFoodAPI::class.java)
 
-        val USDA_API_KEY = "thIkdfBjMfBQ9UtDaLHXha6BVbT00DAwbzbxwZxX"
+        val ninjasClient = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                chain.proceed(
+                    chain.request().newBuilder()
+                        .header("X-Api-Key", NINJAS_API_KEY)
+                        .build()
+                )
+            }
+            .build()
+
+        val ninjasApi = Retrofit.Builder()
+            .baseUrl("https://api.api-ninjas.com/")
+            .client(ninjasClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(NinjasAPI::class.java)
 
         foodRepository = FoodRepository(db.FoodDao(), openFoodApi, usdaApi, USDA_API_KEY)
         userRepository     = UserRepository(db.userDao())
         mealRepository     = MealRepository(db.mealDao())
         workoutRepository  = WorkoutRepository(db.WorkoutDao())
+        exerciseRepository = ExerciseRepository(db.ExerciseDao(), ninjasApi)
+
 
         setContent {
             val userViewModel: UserViewModel       = viewModel(factory = UserViewModelFactory(userRepository))
             val mealViewModel: MealViewModel       = viewModel(factory = MealViewModelFactory(mealRepository))
             val workoutViewModel: WorkoutViewModel = viewModel(factory = WorkoutViewModelFactory(workoutRepository))
             val foodViewModel: FoodViewModel       = viewModel(factory = FoodViewModelFactory(foodRepository))
+            val exerciseViewModel: ExerciseViewModel = viewModel(factory = ExerciseViewModelFactory(exerciseRepository))
 
-            val user by userViewModel.user.observeAsState()
 
             // UI state
             var isLoading by remember { mutableStateOf(true) }
@@ -75,69 +97,66 @@ class MainActivity : ComponentActivity() {
             var activeMealId by remember { mutableIntStateOf(0) }
             var activeDate by remember { mutableStateOf(todayAsString()) }
             var currentScreen by remember { mutableStateOf<Screen?>(null) }
+            var userLoaded by remember { mutableStateOf(false) }
+            val user by userViewModel.user.observeAsState()
 
-            LaunchedEffect(user) {
-                currentScreen = if (user == null) Screen.SETUP else Screen.HOME
+            LaunchedEffect(Unit) {
+                userViewModel.loadUser()
+                userLoaded = true
+            }
+
+            LaunchedEffect(userLoaded, user) {
+                if (!userLoaded) return@LaunchedEffect
+                // Only set initial screen - don't override mid-session navigation
+                if (currentScreen == null) {
+                    currentScreen = if (user == null) Screen.SETUP else Screen.HOME
+                }
+                // If user just completed setup, go home
+                if (currentScreen == Screen.SETUP && user != null) {
+                    currentScreen = Screen.HOME
+                }
             }
 
             when (currentScreen) {
-
                 null -> SplashScreen()
 
-                Screen.SETUP -> {
-                    SetupScreen(userViewModel)
-                }
+                Screen.SETUP -> SetupScreen(userViewModel)
 
-                Screen.HOME -> {
-                    HomeScreen(
-                        userViewModel = userViewModel,
-                        mealViewModel = mealViewModel,
-                        workoutViewModel = workoutViewModel,
+                Screen.HOME -> HomeScreen(
+                    userViewModel    = userViewModel,
+                    mealViewModel    = mealViewModel,
+                    workoutViewModel = workoutViewModel,
+                    onNavigateToMeals = {
+                        activeDate = todayAsString()
+                        currentScreen = Screen.FOOD_SEARCH
+                    },
+                    onNavigateToHistory = { currentScreen = Screen.MEAL_HISTORY },
+                    onNavigateToWorkout = {
+                        activeDate = todayAsString()
+                        currentScreen = Screen.WORKOUT
+                    }
+                )
 
-                        onNavigateToMeals = {
-                            val today = todayAsString()
+                Screen.FOOD_SEARCH -> MealLoggingScreen(
+                    foodViewModel = foodViewModel,
+                    mealViewModel = mealViewModel,
+                    targetDate    = activeDate,
+                    onDismiss     = { currentScreen = Screen.HOME }
+                )
 
-                            mealViewModel.createMealAndStartLogging(
-                                type = "Meal",
-                                date = today
-                            ) { mealId ->
-                                activeMealId = mealId
-                                activeDate = today
-                                currentScreen = Screen.FOOD_SEARCH
-                            }
-                        },
+                Screen.MEAL_HISTORY -> MealHistoryScreen(
+                    mealViewModel = mealViewModel,
+                    onBack        = { currentScreen = Screen.HOME }
+                )
 
-                        onNavigateToHistory = {
-                            currentScreen = Screen.MEAL_HISTORY
-                        },
+                //Screen.WORKOUT -> SplashScreen()
 
-                        onNavigateToWorkout = {
-                            // later
-                        }
-                    )
-                }
-
-                Screen.FOOD_SEARCH -> {
-
-                    MealLoggingScreen(
-                        foodViewModel = foodViewModel,
-                        mealViewModel = mealViewModel,
-                        targetDate = activeDate,
-                        onDismiss = {
-                            mealViewModel.deleteMealIfEmpty(activeMealId)
-                            currentScreen = Screen.HOME
-                        }
-                    )
-                }
-
-                Screen.MEAL_HISTORY -> {
-                    MealHistoryScreen(
-                        mealViewModel = mealViewModel,
-                        onBack = {
-                            currentScreen = Screen.HOME
-                        }
-                    )
-                }
+                Screen.WORKOUT -> WorkoutLoggingScreen(
+                    exerciseViewModel = exerciseViewModel,
+                    workoutViewModel  = workoutViewModel,
+                    targetDate        = activeDate,
+                    onDismiss         = { currentScreen = Screen.HOME }
+                )
             }
         }
     }
@@ -147,7 +166,8 @@ enum class Screen {
     SETUP,
     HOME,
     FOOD_SEARCH,
-    MEAL_HISTORY
+    MEAL_HISTORY,
+    WORKOUT
 }
 // Splash / Loading Screen
 @Composable

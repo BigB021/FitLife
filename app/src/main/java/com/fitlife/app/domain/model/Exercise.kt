@@ -5,9 +5,16 @@ import androidx.room.PrimaryKey
 
 @Entity()
 data class Exercise (
-    @PrimaryKey val id: String,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
-    val bodyPart: String,
+    val type: String,
+    val muscle: String,
     val equipment: String,
-    val gifUrl: String
-)
+    val difficulty: String,
+    val instructions: String,
+    val safetyInfo: String
+) {
+    // Getter to get back the list anywhere in the UI
+    fun equipmentList(): List<String> =
+        equipment.split(",").map { it.trim() }.filter { it.isNotBlank() }
+}

@@ -1,13 +1,16 @@
 package com.fitlife.app.utils
 
+import com.fitlife.app.data.dto.ExerciseDto
 import com.fitlife.app.data.dto.ProductDto
 import com.fitlife.app.data.dto.SearchProductDto
 import com.fitlife.app.data.dto.UsdaFoodDto
+import com.fitlife.app.domain.model.Exercise
 import com.fitlife.app.domain.model.FoodEntry
 
 fun ProductDto.toFoodEntry(mealId: Int): FoodEntry = FoodEntry(
+    // OpenFoodFact
     mealId   = mealId,
-    foodName = productName?.takeIf { it.isNotBlank() } ?: "Unknown",
+    foodName = product_name?.takeIf { it.isNotBlank() } ?: "Unknown",
     calories = nutriments?.resolvedKcal() ?: 0f,
     protein  = nutriments?.resolvedProtein() ?: 0f,
     carbs    = nutriments?.resolvedCarbs() ?: 0f,
@@ -44,5 +47,18 @@ fun UsdaFoodDto.toFoodEntry(mealId: Int): FoodEntry {
         carbs    = carbs(),
         fat      = fat(),
         quantity = 100f
+    )
+}
+
+fun ExerciseDto.toExercise(): Exercise {
+
+    return Exercise(
+        name         = name?.trim() ?: "Unknown",
+        type         = type ?: "strength",
+        muscle       = muscle ?: "unknown",
+        equipment    = equipments?.joinToString(",") ?: "unknown",
+        difficulty   = difficulty ?: "beginner",
+        instructions = instructions ?: "",
+        safetyInfo   = safetyInfo ?: ""
     )
 }
