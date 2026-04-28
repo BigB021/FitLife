@@ -1,6 +1,7 @@
 package com.fitlife.app.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +20,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -60,35 +62,40 @@ fun HomeScreen(
         mealViewModel.loadTodayMeals(today)
         workoutViewModel.getAllSessions()
     }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        GreetingHeader(user = user)
-        user?.let { CalorieSummaryCard(user = it, summary = dailyMacros) }
-        user?.let { MacroProgressCard(user = it, summary = dailyMacros) }
-        QuickActionsRow(onAddMeal = onNavigateToMeals, onAddWorkout = onNavigateToWorkout)
-
-        // Today's meals with their foods
-        if (todayMealsWithFood.isNotEmpty()) {
-            TodayMealsCard(
-                mealsWithFood = todayMealsWithFood,
-                onDeleteFood  = { food -> mealViewModel.deleteFood(food) }
-            )
-        }
-
-        if (sessions.isNotEmpty()) RecentWorkoutsCard(sessions = sessions.take(3))
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            onClick = onNavigateToHistory,
-            modifier = Modifier.fillMaxWidth()
+    Scaffold(                                              // ← wrap in Scaffold
+        containerColor = MaterialTheme.colorScheme.background  // ← forces background color
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background) // ← explicit bg
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("View Meal History")
+            Spacer(modifier = Modifier.height(8.dp))
+            GreetingHeader(user = user)
+            user?.let { CalorieSummaryCard(user = it, summary = dailyMacros) }
+            user?.let { MacroProgressCard(user = it, summary = dailyMacros) }
+            QuickActionsRow(onAddMeal = onNavigateToMeals, onAddWorkout = onNavigateToWorkout)
+
+            if (todayMealsWithFood.isNotEmpty()) {
+                TodayMealsCard(
+                    mealsWithFood = todayMealsWithFood,
+                    onDeleteFood  = { food -> mealViewModel.deleteFood(food) }
+                )
+            }
+
+            if (sessions.isNotEmpty()) RecentWorkoutsCard(sessions = sessions.take(3))
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = onNavigateToHistory,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("View Meal History")
+            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
