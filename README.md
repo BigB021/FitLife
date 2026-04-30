@@ -5,9 +5,24 @@ A native Android fitness tracking application built with **Jetpack Compose** and
 ---
 
 ## Screenshots
-![fitlife](Screenshots/fitlife%20(1).jpeg)
 
-![fitlife](Screenshots/fitlife%20(2).jpeg)
+<table>
+  <tr>
+    <td><img src="Screenshots/fitlife%20(1).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(2).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(3).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(4).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(5).jpeg" width="180"/></td>
+  </tr>
+  <tr>
+    <td><img src="Screenshots/fitlife%20(6).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(7).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(8).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(9).jpeg" width="180"/></td>
+    <td><img src="Screenshots/fitlife%20(10).jpeg" width="180"/></td>
+  </tr>
+</table>
+
 ---
 
 ## Features
