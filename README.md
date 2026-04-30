@@ -5,9 +5,9 @@ A native Android fitness tracking application built with **Jetpack Compose** and
 ---
 
 ## Screenshots
+![fitlife](Screenshots/fitlife%20(1).jpeg)
 
-
-
+![fitlife](Screenshots/fitlife%20(2).jpeg)
 ---
 
 ## Features
